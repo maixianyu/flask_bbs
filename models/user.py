@@ -1,10 +1,11 @@
 import hashlib
 
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, Enum
 
 import config
 # import secret
 from models.base_model import SQLMixin, db
+from .user_role import UserRole
 
 
 class User(SQLMixin, db.Model):
@@ -18,6 +19,7 @@ class User(SQLMixin, db.Model):
     image = Column(String(100), nullable=False, default='/images/3.jpg')
     # email = Column(String(50), nullable=False, default=config.test_mail)
     email = Column(String(50), nullable=False)
+    role = Column(Enum(UserRole), nullable=False)
 
     @staticmethod
     def salted_password(password, salt='$!@><?>HUI&DWQa`'):
@@ -29,16 +31,26 @@ class User(SQLMixin, db.Model):
         name = form.get('username', '')
         print('register', form)
         if len(name) > 2 and User.one(username=name) is None:
-            # 错误，只应该 commit 一次
-            # u = User.new(form)
-            # u.password = u.salted_password(pwd)
-            # User.session.add(u)
-            # User.session.commit()
             form['password'] = User.salted_password(form['password'])
+            form['role'] = UserRole.normal
             u = User.new(form)
             return u
         else:
             return None
+
+    @staticmethod
+    def guest():
+        form = dict()
+        form['username'] = '游客'
+        form['role'] = UserRole.normal
+        form['image'] = '/images/3.jpg'
+        u = __class__()
+        for k, v in form.items():
+            setattr(u, k, v)
+        return u
+
+    def is_guest(self):
+        return self.role == UserRole.guest
 
     @classmethod
     def validate_login(cls, form):

@@ -4,7 +4,8 @@ from functools import wraps
 from flask import (
     request,
     abort,
-    Response,
+    redirect,
+    url_for,
 )
 
 from models.user import User
@@ -27,7 +28,7 @@ def current_user():
         u = User.one(id=uid)
         return u
     else:
-        return None
+        return User.guest()
 
 
 csrf_tokens = dict()
@@ -36,21 +37,14 @@ csrf_tokens = dict()
 def csrf_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
-        # token = request.args['token']
-        # u = current_user()
-        # if token in csrf_tokens and csrf_tokens[token] == u.id:
-        #     csrf_tokens.pop(token)
-        #     return f(*args, **kwargs)
-        # else:
-        #     abort(401)
-
         token = request.args['token']
         u = current_user()
         # v = None
 
-        if cache_csrf.exists(token) and\
-                json.loads(cache_csrf.get(token)) == u.id:
-            # v = json.loads(cache_csrf.get(token))
+        if u.is_guest():
+            return redirect(url_for('.index', message='请登录'))
+        elif cache_csrf.exists(token)\
+                and json.loads(cache_csrf.get(token)) == u.id:
             cache_csrf.delete(token)
             return f(*args, **kwargs)
         else:

@@ -46,8 +46,9 @@ def configured_app():
     app.template_filter()(count)
     app.template_filter()(format_time)
 
-    uri = 'mysql+pymysql://root:{}@localhost/web19?charset=utf8mb4'.format(
-        secret.database_password
+    uri = 'mysql+pymysql://root:{}@localhost/{}?charset=utf8mb4'.format(
+        secret.database_password,
+        secret.database_name,
     )
     app.config['SQLALCHEMY_DATABASE_URI'] = uri
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
