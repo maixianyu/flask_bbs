@@ -1,0 +1,334 @@
+{% extends "topic/base.html" %}
+{% block title %}论坛主页{% endblock%}
+{% block main %}
+<div id="main">
+  <div id="sidebar">
+
+  <div class="panel">
+
+    <div class="header">
+      <span class="col_fade">个人信息</span>
+    </div>
+    <div class="inner">
+      <div class="user_card">
+  <div>
+    <a class="user_avatar" href="{{ url_for('index.profile') }}">
+      <img src="{{ user.image }}" title="{{ user.username }}">
+    </a>
+    <span class="user_name"><a class="dark" href="{{ url_for('index.profile') }}">{{ user.username }}</a></span>
+
+    <div class="board clearfix">
+      <div class="floor">
+        <span class="big">积分: 0 </span>
+      </div>
+    </div>
+    <div class="space clearfix"></div>
+    <span class="signature">
+        “
+
+            这家伙很懒，什么个性签名都没有留下。
+
+        ”
+    </span>
+  </div>
+</div>
+
+
+<script>
+  $(document).ready(function () {
+    $('.follow_btn').click(function () {
+      var $me = $(this);
+      var action = $me.attr('action');
+      var params = {
+        follow_id: '5d04a0c695fcc914aa269404',
+        _csrf: 'vYbgAPxQ-Jrom5ACEH6isGrFIMv_B9uFId8M'
+      };
+      $.post('/user/' + action, params, function (data) {
+        if (data.status === 'success') {
+          var $btns = $('.follow_btn');
+          if (action === 'follow') {
+            $btns.html('取消关注');
+            $btns.attr('action', 'un_follow');
+          } else {
+            $btns.html('加入关注');
+            $btns.attr('action', 'follow');
+          }
+          $btns.toggleClass('btn-success');
+        }
+      }, 'json');
+    });
+  });
+</script>
+
+
+    </div>
+
+  </div>
+
+
+  <div class="panel">
+    <div class="inner">
+      <a href="{{ url_for('topic.new') }}" id="create_topic_btn">
+        <span class="span-success">发布话题</span>
+      </a>
+    </div>
+  </div>
+
+
+
+
+<div class="panel">
+  <div class="inner ads">
+
+        <div class="sep10"></div>
+
+  </div>
+</div>
+
+
+
+
+
+
+
+  <div class="panel">
+    <div class="header">
+      <span class="col_fade">友情社区</span>
+    </div>
+    <div class="inner">
+      <ol class="friendship-community">
+
+      </ol>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="header">
+      <span class="col_fade">客户端二维码</span>
+    </div>
+    <div class="inner cnode-app-download">
+
+    </div>
+  </div>
+
+</div>
+
+
+<div id="content">
+  <div class="panel">
+    <div class="header">
+      <ul class="breadcrumb">
+        <li><a href="https://cnodejs.org/">主页</a><span class="divider">/</span></li>
+      </ul>
+    </div>
+    <div class="inner userinfo">
+      <div class="user_big_avatar">
+        <img src="{{ user.image }}" class="user_avatar" title="{{ user.username }}">
+      </div>
+      <a class="dark">{{ user.username }}</a>
+
+      <div class="user_profile">
+        <ul class="unstyled">
+          <span class="big">0</span> 积分
+
+
+
+
+          <li>
+            <i class="fa fa-lg fa-fw fa-github"></i>
+            <a class="dark" href="" target="_blank">
+              @{{ user.username }}
+            </a>
+          </li>
+
+
+        </ul>
+      </div>
+      <p class="col_fade">注册时间 几秒前</p>
+
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="header">
+      <span class="col_fade">最近创建的话题</span>
+    </div>
+
+    {% for t in topics %}
+        <div class="cell">
+          <a class="user_avatar pull-left" href="">
+            <img src="{{ user.image }}" title="{{ user.username }}">
+          </a>
+          <span class="reply_count pull-left">
+            <span class="count_of_replies" title="回复数">
+              {{ t.replies() | count }}
+            </span>
+            <span class="count_seperator">/</span>
+            <span class="count_of_visits" title="点击数">
+              {{ t.views }}
+            </span>
+          </span>
+          <a class="last_time pull-right" href="/topic/5d04ab7d95fcc914aa269430#5d04ab8895fcc914aa269433">
+            <img class="user_small_avatar" src="https://avatars2.githubusercontent.com/u/16153380?v=4&amp;s=120">
+            <span class="last_active_time">{{ t.created_time | format_time }}</span>
+          </a>
+
+          <div class="topic_title_wrapper">
+            <a class="topic_title" href="{{ url_for('topic.detail', id=t.id) }}" title="{{ t.title }}">
+              {{ t.title }}
+            </a>
+          </div>
+        </div>
+    {% endfor %}
+
+  </div>
+
+  <div class="panel">
+    <div class="header">
+      <span class="col_fade">最近参与的话题</span>
+    </div>
+{% for r in replies %}
+    <div class="cell">
+      <a class="user_avatar pull-left" href="/user/{{ user.username }}">
+        <img src="{{ user.image }}" title="{{ user.username }}">
+      </a>
+      <span class="reply_count pull-left">
+        <span class="count_of_replies" title="回复数">
+            {{ r.topic().replies() | count }}
+        </span>
+        <span class="count_seperator">/</span>
+        <span class="count_of_visits" title="点击数">
+            {{ r.topic().views }}
+        </span>
+      </span>
+      <a class="last_time pull-right" href="/topic/5d04ab7d95fcc914aa269430#5d04ab8895fcc914aa269433">
+        <img class="user_small_avatar" src="https://avatars2.githubusercontent.com/u/16153380?v=4&amp;s=120">
+        <span class="last_active_time">{{ r.updated_time | format_time }}</span>
+      </a>
+
+      <div class="topic_title_wrapper">
+        <a class="topic_title" href="{{ url_for('topic.detail', id=r.topic().id) }}" title="{{ r.topic().title }}">
+          {{ r.topic().title }}
+        </a>
+      </div>
+    </div>
+{% endfor %}
+
+  </div>
+</div>
+
+
+<script>
+  $(document).ready(function () {
+    $('#set_star_btn').click(function () {
+      var $me = $(this);
+      var action = $me.attr('action');
+      var params = {
+        user_id: '5d04a0c695fcc914aa269404',
+        _csrf: 'vYbgAPxQ-Jrom5ACEH6isGrFIMv_B9uFId8M'
+      };
+      $.post('/user/' + action, params, function (data) {
+        if (data.status === 'success') {
+          if (action === 'set_star') {
+            $me.html('取消达人');
+            $me.attr('action', 'cancel_star');
+          } else {
+            $me.html('设为达人');
+            $me.attr('action', 'set_star');
+          }
+        }
+      }, 'json');
+    });
+
+    $('#set_block_btn').click(function () {
+      var $me = $(this);
+      var action = $me.attr('action');
+      var params = {
+        _csrf: 'vYbgAPxQ-Jrom5ACEH6isGrFIMv_B9uFId8M',
+        action: action
+      };
+      if (action === 'set_block' && !confirm('确定要屏蔽该用户吗？')) {
+        return;
+      }
+      $.post('/user/{{ user.username }}/block', params, function (data) {
+        if (data.status === 'success') {
+          if (action === 'set_block') {
+            $me.html('取消屏蔽用户');
+            $me.attr('action', 'cancel_block');
+          } else if (action === 'cancel_block') {
+            $me.html('屏蔽用户');
+            $me.attr('action', 'set_block');
+          }
+        }
+      }, 'json');
+    })
+
+    $('#delete_all').click(function () {
+      var $me = $(this);
+      var params = {
+        _csrf: 'vYbgAPxQ-Jrom5ACEH6isGrFIMv_B9uFId8M',
+      };
+      if (!confirm('确定要删除吗？（不会永久删除，只做标记位）')) {
+        return;
+      }
+      $.post('/user/{{ user.username }}/delete_all', params, function (data) {
+        if (data.status === 'success') {
+          alert('操作成功');
+        }
+      }, 'json');
+    })
+  });
+</script>
+
+
+</div>
+<div id="backtotop" style="top: 339px; right: 0px;">回到顶部</div>
+<div id="footer">
+  <div id="footer_main">
+    <div class="links">
+      <a class="dark" href="https://cnodejs.org/rss">RSS</a>
+      |
+      <a class="dark" href="https://github.com/cnodejs/nodeclub/">源码地址</a>
+    </div>
+
+    <div class="col_fade">
+
+  <p>CNode 社区为国内最专业的 Node.js 开源技术社区，致力于 Node.js 的技术研究。</p>
+  <p>服务器赞助商为
+    <a href="http://www.ucloud.cn/?utm_source=zanzhu&amp;utm_campaign=cnodejs&amp;utm_medium=display&amp;utm_content=yejiao&amp;ytag=cnodejs_logo" target="_blank" class="sponsor_outlink" data-label="ucloud_bottom">
+
+    </a>
+  ，存储赞助商为
+    <a href="http://www.qiniu.com/?ref=cnode" target="_blank" class="sponsor_outlink" data-label="qiniu_bottom">
+
+    </a>
+  ，由<a href="https://www.aliyun.com/product/nodejs?ref=cnode" target="_blank" class="sponsor_outlink" data-label="alinode_bottom">
+
+    </a>提供应用性能服务。
+  </p>
+  <p>新手搭建 Node.js 服务器，推荐使用无需备案的 <a href="https://www.digitalocean.com/?refcode=eba02656eeb3">DigitalOcean(https://www.digitalocean.com/)</a></p>
+</div>
+
+
+  </div>
+</div>
+<div id="sidebar-mask"></div>
+
+
+<script>
+  // google analytics
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script', "https://www.google-analytics.com/analytics.js",'ga');
+
+  ga('create', 'UA-41753901-5', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+<div style="display:none;">
+  <script src="./@{{ user.username }} 的个人主页 - CNode技术社区_files/z_stat.php" language="JavaScript"></script><script src="./@{{ user.username }} 的个人主页 - CNode技术社区_files/core.php" charset="utf-8" type="text/javascript"></script><a href="https://www.cnzz.com/stat/website.php?web_id=1254020586" target="_blank" title="站长统计">站长统计</a>
+</div>
+
+{% endblock %}
