@@ -62,13 +62,6 @@ def login():
     if u is None:
         return redirect(url_for('.index'))
     else:
-        # # session 中写入 user_id
-        # session['user_id'] = u.id
-        # # 设置 cookie 有效期为 永久
-        # session.permanent = True
-        # # 转到 topic.index 页面
-        # return redirect(url_for('topic.index'))
-
         resp = make_response(redirect(url_for('topic.index')))
         # 设置 cookie
         s = str(uuid.uuid4())

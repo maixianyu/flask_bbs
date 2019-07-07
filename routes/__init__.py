@@ -2,7 +2,6 @@ import uuid
 from functools import wraps
 
 from flask import (
-    session,
     request,
     abort,
     Response,
